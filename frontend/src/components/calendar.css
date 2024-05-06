@@ -1,0 +1,94 @@
+.calendar-events-container {
+  width: 50vw;
+  height: 80vh;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.calendar-modal {
+  border-radius: 20px !important;
+}
+.calendar-header {
+  width: 100%;
+  height: 50px;
+  background-color: #f1f3f4;
+  position: relative;
+}
+
+.calendar-close-icon {
+  position: absolute;
+  right: 5px;
+  top: 30%;
+  cursor: pointer;
+}
+
+.calendar-events-container-child {
+  width: 100%;
+  height: 100%;
+  padding-inline: 20px;
+}
+
+.calendar-title {
+  outline: none !important;
+  border: none;
+  border-bottom: 1px solid gray;
+  display: block;
+  margin: 20px auto;
+  width: 100%;
+}
+.calendar-buttons {
+  gap: 10px;
+  display: flex;
+}
+.calendar-buttons > button {
+  background-color: #e8f0fe;
+  color: #1967d2;
+  padding: 0.3rem 0.7rem;
+  border-radius: 10px;
+}
+.calendar-clock-container {
+  display: flex;
+  margin-block: 25px;
+}
+.calendar-clock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.calendar-start-time {
+  margin-left: 20px;
+}
+
+.calendar-timing {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.calendar-inputs {
+  border: none !important;
+  margin-block: 3px;
+}
+
+.calendar-save-button {
+  padding: 0.3rem 1.7rem;
+  border-radius: 100vmax;
+  background-color: #1967d2;
+  color: white;
+}
+
+.calendar-cancel-button {
+  padding: 0.3rem 1.7rem;
+  border-radius: 100vmax;
+  background-color: lightgray;
+  color: rgb(39, 39, 39);
+}
+
+.calendar-all-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: right;
+}
