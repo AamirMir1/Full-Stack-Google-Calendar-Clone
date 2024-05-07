@@ -3,6 +3,7 @@ import {
   addEventReducer,
   deleteEventReducer,
   getAllEventsReducer,
+  updateEventReducer,
 } from "./reducer/eventReducer";
 
 const store = configureStore({
@@ -10,6 +11,7 @@ const store = configureStore({
     getAllEvents: getAllEventsReducer,
     addEvent: addEventReducer,
     deleteEvent: deleteEventReducer,
+    updateEvent: updateEventReducer,
   },
 });
 

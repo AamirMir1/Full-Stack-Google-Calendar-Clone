@@ -164,6 +164,34 @@ app.put(`/addevent/:id`, async (req, res) => {
   }
 });
 
+app.put(`/updateEvent/:id`, async (req, res) => {
+  try {
+    console.log(req.params.id, "this is req");
+    const event = await Event.findOne({ id: req.params.id });
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: "Event not found",
+      });
+    }
+
+    await Event.findOneAndUpdate({ id: req.params.id }, req.body, {
+      runValidators: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Event Updated Successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is working on port:${port}`);
 });

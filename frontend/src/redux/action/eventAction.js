@@ -51,3 +51,27 @@ export const deleteEvent = (id) => async (dispatch) => {
     });
   }
 };
+
+export const updateEvent = (updateData, id) => async (dispatch) => {
+  try {
+    dispatch({ type: "updateEventRequest" });
+    const { data } = await axios.put(
+      `http://localhost:4000/updateEvent/${id}`,
+      { ...updateData },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    dispatch({
+      type: "updateEventSuccess",
+      payload: data.message,
+    });
+  } catch (error) {
+    dispatch({
+      type: "updateEventFailure",
+      payload: error?.response?.data?.message,
+    });
+  }
+};

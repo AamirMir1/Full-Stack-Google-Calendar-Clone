@@ -57,3 +57,23 @@ export const deleteEventReducer = createReducer({}, (bundler) => {
     state.message = null;
   });
 });
+
+export const updateEventReducer = createReducer({}, (bundler) => {
+  bundler.addCase("updateEventRequest", (state) => {
+    state.loading = true;
+  });
+  bundler.addCase("updateEventSuccess", (state, action) => {
+    state.loading = false;
+    state.message = action.payload;
+  });
+  bundler.addCase("updateEventFailure", (state, action) => {
+    state.loading = false;
+    state.error = action.payload;
+  });
+  bundler.addCase("clearError", (state, action) => {
+    state.error = null;
+  });
+  bundler.addCase("clearMessage", (state, action) => {
+    state.message = null;
+  });
+});

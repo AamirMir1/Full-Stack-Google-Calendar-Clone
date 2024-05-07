@@ -13,6 +13,7 @@ import {
   addEvent,
   deleteEvent,
   getAllEvents,
+  updateEvent,
 } from "../redux/action/eventAction";
 import { HiUserGroup } from "react-icons/hi";
 import { TbFileDescription } from "react-icons/tb";
@@ -64,6 +65,7 @@ export default function EventModal() {
   const [guests, setGuests] = useState("");
   const [location, setLocation] = useState("");
 
+  console.log(startTime, "this is start time hehe");
   const formatTime = (time) => {
     if (time) {
       const [hours, minutes] = time.split(":");
@@ -74,6 +76,22 @@ export default function EventModal() {
       return "";
     }
   };
+
+  const { message: updateEventMessage, error: updateEventError } = useSelector(
+    (state) => state.updateEvent
+  );
+
+  useEffect(() => {
+    if (updateEventMessage) {
+      toast.success(updateEventMessage);
+      dispatch({ type: "clearMessage" });
+      setShowEventModal(false);
+    }
+    if (updateEventError) {
+      toast.error(updateEventError);
+      dispatch({ type: "clearError" });
+    }
+  }, [dispatch, updateEventMessage, updateEventError]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -95,7 +113,26 @@ export default function EventModal() {
     // } else {
     //   dispatchCalEvent({ type: "push", payload: calendarEvent });
     // }
-    await dispatch(addEvent(calendarEvent));
+
+    if (isEdit) {
+      await dispatch(
+        updateEvent(
+          {
+            title,
+            description,
+            label: selectedLabel,
+            startTime: formatTime(startTime),
+            endTime: formatTime(endTime),
+            guests,
+            location,
+            status,
+          },
+          selectedEvent.id
+        )
+      );
+    } else {
+      await dispatch(addEvent(calendarEvent));
+    }
     dispatch(getAllEvents());
   }
 
@@ -121,9 +158,24 @@ export default function EventModal() {
       dispatch({ type: "clearError" });
     }
   }, [dispatch, deleteEventMessage, deleteEventError]);
+
+  const [isEdit, setIsEdit] = useState("");
+
+  useEffect(() => {
+    if (isEdit) {
+      setTitle(selectedEvent.title);
+      setDescription(selectedEvent.description);
+      setEndTime(selectedEvent.endTime);
+      setStartTime(selectedEvent.startTime);
+      setGuests(selectedEvent.guests);
+      setLocation(selectedEvent.location);
+      setStatus(selectedEvent.status);
+    }
+  }, [isEdit]);
+
   return (
     <div className="h-screen w-full fixed left-0 top-0 flex justify-center items-center">
-      {!selectedEvent ? (
+      {!selectedEvent || isEdit ? (
         <Modal className="calendar-modal" show={true}>
           <div className="calendar-events-container">
             <div className="calendar-header">
@@ -178,6 +230,7 @@ export default function EventModal() {
                   <span>{daySelected.format("dddd, MMMM DD")}</span>
                   <div className="calendar-timing calendar-start-time">
                     <TimePicker
+                      defaultValue={startTime}
                       useTwelveHourFormat={true}
                       onTimeChange={setStartTime}
                       showClockIcon={false}
@@ -186,6 +239,7 @@ export default function EventModal() {
                   </div>
                   <div className="calendar-timing">
                     <TimePicker
+                      defaultValue={endTime}
                       useTwelveHourFormat={true}
                       onTimeChange={setEndTime}
                       showClockIcon={false}
@@ -263,7 +317,11 @@ export default function EventModal() {
                 <div
                   style={{ display: "flex", marginInline: "20px", gap: "7px" }}
                 >
-                  <FaRegEdit color="#5f6368" size={22} />
+                  <FaRegEdit
+                    onClick={() => setIsEdit(selectedEvent.id)}
+                    color="#5f6368"
+                    size={22}
+                  />
                   <RiDeleteBin6Line
                     onClick={handleDeleteEvent}
                     color="#5f6368"
