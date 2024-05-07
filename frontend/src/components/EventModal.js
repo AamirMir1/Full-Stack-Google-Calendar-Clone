@@ -5,8 +5,15 @@ import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import "react-time-picker/dist/TimePicker.css";
 import "react-clock/dist/Clock.css";
-import TimePicker from "react-time-picker";
-import { addEvent, getAllEvents } from "../redux/action/eventAction";
+import TimePicker from "@ashwinthomas/react-time-picker-dropdown";
+import { FaRegEdit } from "react-icons/fa";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { MdDelete } from "react-icons/md";
+import {
+  addEvent,
+  deleteEvent,
+  getAllEvents,
+} from "../redux/action/eventAction";
 import { HiUserGroup } from "react-icons/hi";
 import { TbFileDescription } from "react-icons/tb";
 import { MdOutlineGroup } from "react-icons/md";
@@ -57,6 +64,17 @@ export default function EventModal() {
   const [guests, setGuests] = useState("");
   const [location, setLocation] = useState("");
 
+  const formatTime = (time) => {
+    if (time) {
+      const [hours, minutes] = time.split(":");
+      let formattedTime = `${parseInt(hours, 10) % 12}:${minutes}`;
+      formattedTime += parseInt(hours, 10) >= 12 ? " PM" : " AM";
+      return formattedTime;
+    } else {
+      return "";
+    }
+  };
+
   async function handleSubmit(e) {
     e.preventDefault();
     const calendarEvent = {
@@ -65,8 +83,8 @@ export default function EventModal() {
       label: selectedLabel,
       day: daySelected.valueOf(),
       id: selectedEvent ? selectedEvent.id : Date.now(),
-      startTime,
-      endTime,
+      startTime: formatTime(startTime),
+      endTime: formatTime(endTime),
       guests,
       location,
       status,
@@ -81,7 +99,28 @@ export default function EventModal() {
     dispatch(getAllEvents());
   }
 
-  console.log(daySelected, "this is day selected");
+  console.log(selectedEvent, "This is selected events");
+
+  const { message: deleteEventMessage, error: deleteEventError } = useSelector(
+    (state) => state.deleteEvent
+  );
+
+  const handleDeleteEvent = () => {
+    dispatch(deleteEvent(selectedEvent.id));
+  };
+
+  useEffect(() => {
+    if (deleteEventMessage) {
+      toast.success(deleteEventMessage);
+      dispatch({ type: "clearMessage" });
+      setShowEventModal(false);
+      dispatch(getAllEvents());
+    }
+    if (deleteEventError) {
+      toast.error(deleteEventError);
+      dispatch({ type: "clearError" });
+    }
+  }, [dispatch, deleteEventMessage, deleteEventError]);
   return (
     <div className="h-screen w-full fixed left-0 top-0 flex justify-center items-center">
       {!selectedEvent ? (
@@ -138,21 +177,19 @@ export default function EventModal() {
                   <CiClock2 size={20} />
                   <span>{daySelected.format("dddd, MMMM DD")}</span>
                   <div className="calendar-timing calendar-start-time">
-                    <span>Start Time:</span>
                     <TimePicker
-                      value={startTime}
-                      disableClock
-                      onChange={setStartTime}
-                      clockIcon
+                      useTwelveHourFormat={true}
+                      onTimeChange={setStartTime}
+                      showClockIcon={false}
+                      placeholder={"Start Time"}
                     />
                   </div>
                   <div className="calendar-timing">
-                    <span>End Time:</span>
                     <TimePicker
-                      value={endTime}
-                      onChange={setEndTime}
-                      disableClock
-                      clockIcon
+                      useTwelveHourFormat={true}
+                      onTimeChange={setEndTime}
+                      showClockIcon={false}
+                      placeholder={"End Time"}
                     />
                   </div>
                 </div>
@@ -219,12 +256,93 @@ export default function EventModal() {
           </div>
         </Modal>
       ) : (
-        <Modal show={true} onHide={() => setShowEventModal(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Modal heading</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>Woohoo, you are reading this text in a modal!</Modal.Body>
-          <Modal.Footer></Modal.Footer>
+        <Modal className="calendar-modal" show={true}>
+          <div className="calendar-events-container">
+            <div className="calendar-header calendar-juu">
+              <div>
+                <div
+                  style={{ display: "flex", marginInline: "20px", gap: "7px" }}
+                >
+                  <FaRegEdit color="#5f6368" size={22} />
+                  <RiDeleteBin6Line
+                    onClick={handleDeleteEvent}
+                    color="#5f6368"
+                    size={22}
+                  />
+                </div>
+                <IoMdClose
+                  style={{ marginRight: "10px" }}
+                  onClick={() => setShowEventModal(false)}
+                  size={25}
+                />
+              </div>
+            </div>
+            <div className="calendar-events-container-child">
+              <p className="calendar-event-title">
+                <strong>Title:</strong> {selectedEvent?.title}
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+                className="calendar-buttons"
+              >
+                <span>Status:</span>
+                <button
+                  style={{
+                    color: "#e8f0fe",
+                    backgroundColor: "#1967d2",
+                    padding: "0.4rem 1.5rem",
+                  }}
+                >
+                  {selectedEvent?.status}
+                </button>
+              </div>
+              <div className="calendar-clock-container">
+                <div className="calendar-clock">
+                  <CiClock2 size={20} />
+                  <span>{daySelected.format("dddd, MMMM DD")}</span>
+                  <div style={{ display: "flex", marginLeft: "2rem" }}>
+                    <span style={{ marginRight: "2rem" }}>
+                      <strong>Start Time: </strong> {selectedEvent?.startTime}
+                    </span>
+                    <span>
+                      <strong>End Time: </strong>
+                      {selectedEvent?.endTime}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "15px",
+                }}
+                className="calendar-inputs"
+              >
+                <div className="calendar-clock">
+                  <MdOutlineGroup size={20} />
+                  <span>
+                    <strong>Guests:</strong> {selectedEvent?.guests}
+                  </span>
+                </div>
+                <div className="calendar-clock">
+                  <IoLocationOutline size={20} />
+                  <span>
+                    <strong>Location:</strong> {selectedEvent?.location}
+                  </span>
+                </div>
+                <div className="calendar-clock">
+                  <TbFileDescription size={20} />
+                  <span>
+                    <strong>Description:</strong> {selectedEvent?.description}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </Modal>
       )}
     </div>

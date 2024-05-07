@@ -57,7 +57,7 @@ export default function ContextWrapper(props) {
   // const [filteredEvents, setFilteredEvents] = useState([]);
 
   useEffect(() => {
-    if (events && savedEvents?.length < 1) {
+    if (events) {
       const newArr = events?.map((event) => {
         return {
           ...event,
@@ -68,7 +68,7 @@ export default function ContextWrapper(props) {
       setSavedEvents(events);
       console.log(newArr, "this is new arr");
     }
-  }, [events]);
+  }, [events, dispatch]);
 
   console.log(savedEvents, "these are saved Events");
   // useEffect(() => {

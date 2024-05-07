@@ -33,3 +33,21 @@ export const addEvent = (calendarEvent) => async (dispatch) => {
     });
   }
 };
+
+export const deleteEvent = (id) => async (dispatch) => {
+  try {
+    dispatch({ type: "deleteEventRequest" });
+    const { data } = await axios.delete(
+      `http://localhost:4000/deleteEvent/${id}`
+    );
+    dispatch({
+      type: "deleteEventSuccess",
+      payload: data.message,
+    });
+  } catch (error) {
+    dispatch({
+      type: "deleteEventFailure",
+      payload: error?.response?.data?.message,
+    });
+  }
+};

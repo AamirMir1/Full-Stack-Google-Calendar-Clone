@@ -94,6 +94,31 @@ app.get("/allevents", async (req, res) => {
   }
 });
 
+app.delete("/deleteEvent/:id", async (req, res) => {
+  try {
+    const event = await Event.find({ id: req.params.id });
+
+    if (!event) {
+      return res.status(200).json({
+        success: false,
+        message: "Event not found",
+      });
+    }
+
+    await Event.findOneAndDelete({ id: req.params.id });
+
+    res.status(200).json({
+      success: true,
+      message: "Event Deleted Successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 app.put(`/addevent/:id`, async (req, res) => {
   try {
     const { title, description, label, id, day } = req.body;
